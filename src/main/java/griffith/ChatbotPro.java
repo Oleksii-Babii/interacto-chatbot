@@ -16,7 +16,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ChatbotPro {
     private static final Map<String, List<String>> ingredientMap = new HashMap<>();
-   // private static final Map<String, Integer> cookingTimes = new HashMap<>();
     private static final Map<String, Map<String, String>> nutritionalInfo = new HashMap<>();
     private static final Map<String, String> favoriteRecipes = new HashMap<>();
     private static final String RECIPE_API_URL = "https://api.edamam.com/search";

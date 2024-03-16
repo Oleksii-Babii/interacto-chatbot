@@ -42,13 +42,15 @@ class Chatbot extends JFrame implements ActionListener {
 	private static String input = null;
 
 	public Chatbot() {
+		
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
 		setLayout(null);
 		setSize(500, 430);
 		setLocation(500, 300);
 		getContentPane().setBackground(Color.gray);
-		setTitle("Fitness Program");
+		setTitle("ChefConnect");
+
 
 		/**
 		 * Wrap text area inside the scrole panel
@@ -73,7 +75,6 @@ class Chatbot extends JFrame implements ActionListener {
 
 		cf.addActionListener(this);
 		b.addActionListener(this);
-
 	}
 
 	@Override
@@ -118,13 +119,13 @@ class Chatbot extends JFrame implements ActionListener {
 	}
 
 	public static void main(String[] args) {
+		
 		Chatbot chatbot = new Chatbot();
 		chatbot.setVisible(true);
-
+      
 		output("Welcome to Cooking Helper Chatbot! How can I assist you today?");
 
 		while (true) {
-
 			String userInput = input().toLowerCase();
 			if (userInput.equals("exit")) {
 				output("Exiting Cooking Helper Chatbot. Have a great day!");
@@ -194,7 +195,7 @@ class Chatbot extends JFrame implements ActionListener {
 
 				return "Here's a recipe for " + recipeName + ".\n" + "Cooking time: " + cookingTime + " min\n"
 						+ "Ingredients:\n" + ingredients + "\n" + provideNutritionalInfo(userInput) + "\n"
-						+ "You can find it here: " + recipeUrl;
+						+ "You can find it here:\n " + recipeUrl;
 			} else {
 				return "Sorry, I couldn't find the necessary information for the recipe.";
 			}
@@ -214,14 +215,11 @@ class Chatbot extends JFrame implements ActionListener {
 			JsonNode urlNode = recipeNode.get("url");
 
 			if (labelNode != null && urlNode != null) {
-				String recipeName = labelNode.asText();
 				double hundredGramParts = recipeNode.get("totalWeight").asDouble() / 100.0;
 				JsonNode caloriesNode = recipeNode.get("calories");
 				String calories = String.format("%.02f", caloriesNode.asDouble() / hundredGramParts);
 				JsonNode totalNutrientsNode = recipeNode.get("totalNutrients");
 				JsonNode fatQuantity = totalNutrientsNode.get("FAT").get("quantity");
-
-				// String fatQuantity = fatNode.get("quantity").asText();
 				String fat = String.format("%.02f", fatQuantity.asDouble() / hundredGramParts);
 				JsonNode proteinQuantity = totalNutrientsNode.get("PROCNT").get("quantity");
 				String protein = String.format("%.02f", proteinQuantity.asDouble() / hundredGramParts);
@@ -243,7 +241,7 @@ class Chatbot extends JFrame implements ActionListener {
 			// Make HTTP request to the recipe API
 			userInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8);
 			URL url = new URL(RECIPE_API_URL + "?q=" + userInput + "&app_id=" + APP_ID + "&app_key=" + APP_KEY);
-			// output(url);
+			//output(url.toString());
 			Scanner scanner = new Scanner(url.openStream());
 			StringBuilder responseBuilder = new StringBuilder();
 			while (scanner.hasNextLine()) {
