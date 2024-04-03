@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import org.apache.commons.lang3.text.*;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -97,35 +98,41 @@ class Chatbot extends JFrame {
         add(cf);
         add(b);
         l.setText("SEND");
-        b.setSize(80, 20);
+        b.setSize(80, 30);
         b.setLocation(250, 320);
         ca.setSize(300, 310);
         ca.setLocation(20, 1);
         ca.setBackground(Color.BLACK);
-        cf.setSize(200, 20);
+        cf.setSize(200, 35);
         cf.setLocation(20, 320);
 
         b.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == b) {
-                    String text = cf.getText().toLowerCase();
+                    String text = cf.getText();
+                    
+                    // Wrap text
+                    text = WordUtils.wrap(text, 50);
+                   
+                    
                     ca.setForeground(Color.white);
-                    char[] message = text.toCharArray();
-                    if (message.length > 36) {
-                        int i = 0;
-                        StringBuilder newText = new StringBuilder();
-                        while (i < message.length) {
-                            if (i % 40 == 0 && i != 0) {
-                                newText.append('\n');
-
-                                for (int k = 0; 12 > k; k++)
-                                    newText.append(' ');
-                            }
-                            newText.append(message[i]);
-                            i++;
-                        }
-                        text = newText.toString();
-                    }
+                    
+//                    char[] message = text.toCharArray();
+//                    if (message.length > 36) {
+//                        int i = 0;
+//                        StringBuilder newText = new StringBuilder();
+//                        while (i < message.length) {
+//                            if (i % 40 == 0 && i != 0) {
+//                                newText.append('\n');
+//
+//                                for (int k = 0; 12 > k; k++)
+//                                    newText.append(' ');
+//                            }
+//                            newText.append(message[i]);
+//                            i++;
+//                        }
+//                        text = newText.toString();
+//                    }
                     ca.append("You-->" + text + "\n");
                     cf.setText("");
 
