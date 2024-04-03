@@ -109,30 +109,11 @@ class Chatbot extends JFrame {
         b.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == b) {
-                    String text = cf.getText();
                     
                     // Wrap text
-                    text = WordUtils.wrap(text, 50);
-                   
-                    
+                    String text = WordUtils.wrap(cf.getText(), 50);
+                                       
                     ca.setForeground(Color.white);
-                    
-//                    char[] message = text.toCharArray();
-//                    if (message.length > 36) {
-//                        int i = 0;
-//                        StringBuilder newText = new StringBuilder();
-//                        while (i < message.length) {
-//                            if (i % 40 == 0 && i != 0) {
-//                                newText.append('\n');
-//
-//                                for (int k = 0; 12 > k; k++)
-//                                    newText.append(' ');
-//                            }
-//                            newText.append(message[i]);
-//                            i++;
-//                        }
-//                        text = newText.toString();
-//                    }
                     ca.append("You-->" + text + "\n");
                     cf.setText("");
 
