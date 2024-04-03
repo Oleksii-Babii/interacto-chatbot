@@ -96,7 +96,7 @@ public class ChatbotPro {
         Matcher nutritionMatcher = nutritionPattern.matcher(userInput);
 
         if (nutritionMatcher.find()) {
-        	System.out.println("Enter the name of the dish: ");
+        	System.out.println("Enter the name of the dish or product: ");
         	Scanner input = new Scanner(System.in);
         	String dish = input.nextLine();
             System.out.println(provideNutritionalInfo(dish));
@@ -200,7 +200,7 @@ public class ChatbotPro {
     		// Make HTTP request to the recipe API
             userInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8);
             URL url = new URL(RECIPE_API_URL + "?q=" + userInput + "&app_id=" + APP_ID + "&app_key=" + APP_KEY);
-          System.out.println(url);
+            //System.out.println(url);
             Scanner scanner = new Scanner(url.openStream());
             StringBuilder responseBuilder = new StringBuilder();
             while (scanner.hasNextLine()) {

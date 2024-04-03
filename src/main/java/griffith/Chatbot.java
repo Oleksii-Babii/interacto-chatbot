@@ -16,8 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 class RoundButton extends JButton {
 
     /**
@@ -130,6 +128,7 @@ class Chatbot extends JFrame {
     }
     private void sendMessage() {
          String text = WordUtils.wrap(cf.getText(), 70);
+         
          ca.setForeground(Color.black);
          ca.setFont(new Font("SANS_SERIF", Font.BOLD, 12));
          ca.append("\nYou-->\n" + text + "\n");
