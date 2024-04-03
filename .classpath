@@ -39,6 +39,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
-	<classpathentry kind="lib" path="C:/Users/User/SD2-Chatbot/target/stanford-corenlp-4.4.0-models-english.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

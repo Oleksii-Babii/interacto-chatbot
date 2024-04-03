@@ -146,8 +146,10 @@ public class ChatbotPro {
                 if (labelNode != null && urlNode != null) {
                     String recipeName = labelNode.asText();
                     String recipeUrl = urlNode.asText();
+                    JsonNode ingredients = recipeNode.get("ingredients");
+                    String ingredientsStr = ingredients.asText();
                     return "Here's a recipe for " + recipeName + ".\n"
-                    		
+                    		+ ingredientsStr + "\n"
                     		+ "You can find it here: " + recipeUrl;
                 } else {
                     return "Sorry, I couldn't find the necessary information for the recipe.";
