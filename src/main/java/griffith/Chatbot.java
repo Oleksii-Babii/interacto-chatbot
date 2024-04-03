@@ -109,7 +109,7 @@ class Chatbot extends JFrame {
         ca.setBackground(Color.white);
         cf.setSize(300, 30);
         cf.setLocation(20, 320);
-
+        
         cf.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 sendMessage();
