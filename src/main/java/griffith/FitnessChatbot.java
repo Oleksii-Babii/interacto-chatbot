@@ -1,17 +1,28 @@
 package griffith;
-
+import java.util.List;
 import java.util.Properties;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.stanford.nlp.ling.CoreAnnotations;
+import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.simple.*;
+import edu.stanford.nlp.util.CoreMap;
 
 public class FitnessChatbot {
-	
+
+    private static final StanfordCoreNLP pipeline;
+
+    static {
+        // Set up CoreNLP pipeline
+        Properties props = new Properties();
+        props.setProperty("annotators", "tokenize, ssplit, pos, lemma");
+        pipeline = new StanfordCoreNLP(props);
+    }
+
     public static void main(String[] args) {
-    	
         Scanner scanner = new Scanner(System.in);
         System.out.println("Welcome to Fitness Chatbot! How can I help you today?");
 
@@ -26,21 +37,26 @@ public class FitnessChatbot {
                 System.out.println(response);
             }
         }
+        scanner.close();
     }
 
-    // Lemmatize the user input using Stanford NLP library
+    // Lemmatize user input using Stanford NLP library
     public static String lemmatizeText(String text) {
-        Document doc = new Document(text);
+        Annotation annotation = new Annotation(text);
+        pipeline.annotate(annotation);
+
+        List<CoreMap> sentences = annotation.get(CoreAnnotations.SentencesAnnotation.class);
         StringBuilder lemmatizedText = new StringBuilder();
-        for (Sentence sent : doc.sentences()) {
-            for (String lemma : sent.lemmas()) {
+        for (CoreMap sentence : sentences) {
+            for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
+                String lemma = token.get(CoreAnnotations.LemmaAnnotation.class);
                 lemmatizedText.append(lemma).append(" ");
             }
         }
         return lemmatizedText.toString().trim();
     }
 
-    // Generate response based on user input
+    // Generate response based on lemmatized user input
     public static String generateResponse(String userInput) {
         Pattern exercisePattern = Pattern.compile("\\b(exercise|workout|training)\\b");
         Matcher exerciseMatcher = exercisePattern.matcher(userInput);
