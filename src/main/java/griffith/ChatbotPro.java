@@ -2,6 +2,8 @@ package griffith;
 
 import java.io.IOException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.regex.*;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -9,15 +11,17 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ChatbotPro {
     private static final Map<String, List<String>> ingredientMap = new HashMap<>();
-    private static final Map<String, Integer> cookingTimes = new HashMap<>();
+   // private static final Map<String, Integer> cookingTimes = new HashMap<>();
     private static final Map<String, Map<String, String>> nutritionalInfo = new HashMap<>();
-    private static final Random random = new Random();
     private static final Map<String, String> favoriteRecipes = new HashMap<>();
-    private static final String RECIPE_API_URL = "https://api.spoonacular.com/recipes/complexSearch?apiKey=1346ec58524c4deab81949969895dbe0&query=";
+    //private static final String RECIPE_API_URL = "https://api.spoonacular.com/recipes/complexSearch?apiKey=1346ec58524c4deab81949969895dbe0&query=";
+    private static final String RECIPE_API_URL = "https://api.edamam.com/search";
+    private static final String APP_ID = "b9576f7d";
+    private static final String APP_KEY = "d7a5d085107bf7dd9377ed2a4146576d";
 
     public static void main(String[] args) {
         initializeIngredients();
-        initializeCookingTimes();
+ //       initializeCookingTimes();
         initializeNutritionalInfo();
 
         Scanner scanner = new Scanner(System.in);
@@ -44,12 +48,12 @@ public class ChatbotPro {
         ingredientMap.put("vegetables", Arrays.asList("broccoli", "carrot", "bell pepper"));
     }
 
-    private static void initializeCookingTimes() {
-        // Initialize cooking times (for demonstration)
-        cookingTimes.put("spaghetti", 10);
-        cookingTimes.put("breast", 15);
-        cookingTimes.put("broccoli", 5);
-    }
+//    private static void initializeCookingTimes() {
+//        // Initialize cooking times (for demonstration)
+//        cookingTimes.put("spaghetti", 10);
+//        cookingTimes.put("breast", 15);
+//        cookingTimes.put("broccoli", 5);
+//    }
 
     private static void initializeNutritionalInfo() {
         // Initialize nutritional info (for demonstration)
@@ -77,7 +81,10 @@ public class ChatbotPro {
         Matcher recipeMatcher = recipePattern.matcher(userInput);
 
         if (recipeMatcher.find()) {
-            return suggestRecipe(userInput);
+        	System.out.println("Enter the name of the dish: ");
+        	Scanner input = new Scanner(System.in);
+        	String dish = input.nextLine();
+            return suggestRecipe(dish);
         }
 
         Pattern substitutePattern = Pattern.compile("\\b(substitute|alternative)\\b");
@@ -115,8 +122,43 @@ public class ChatbotPro {
     }
 
     private static String suggestRecipe(String userInput) {
-        // Dummy implementation for demonstration purposes
-        return fetchRecipeFromAPI(userInput);
+        try {
+            // Make HTTP request to the recipe API
+            userInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8);
+            URL url = new URL(RECIPE_API_URL + "?q=" + userInput + "&app_id=" + APP_ID + "&app_key=" + APP_KEY);
+            System.out.println(url);
+            Scanner scanner = new Scanner(url.openStream());
+            StringBuilder responseBuilder = new StringBuilder();
+            while (scanner.hasNextLine()) {
+                responseBuilder.append(scanner.nextLine());
+            }
+            scanner.close();
+
+            // Parse JSON response
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode rootNode = mapper.readTree(responseBuilder.toString());
+            JsonNode hitsNode = rootNode.get("hits");
+            if (hitsNode != null && hitsNode.isArray() && hitsNode.size() > 0) {
+                // Get the first recipe from the response
+                JsonNode recipeNode = hitsNode.get(0).get("recipe");
+                JsonNode labelNode = recipeNode.get("label");
+                JsonNode urlNode = recipeNode.get("url");
+                if (labelNode != null && urlNode != null) {
+                    String recipeName = labelNode.asText();
+                    String recipeUrl = urlNode.asText();
+                    return "Here's a recipe for " + recipeName + ".\n"
+                    		
+                    		+ "You can find it here: " + recipeUrl;
+                } else {
+                    return "Sorry, I couldn't find the necessary information for the recipe.";
+                }
+            } else {
+                return "Sorry, I couldn't find any recipes for your query.";
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "An error occurred while fetching recipes from the API.";
+        }
     }
 
     private static String suggestSubstitute(String userInput) {
@@ -136,22 +178,36 @@ public class ChatbotPro {
     }
 
     private static void provideNutritionalInfo(String userInput) {
-        for (String ingredient : ingredientMap.keySet()) {
-            if (userInput.contains(ingredient)) {
-                // Provide nutritional information for the ingredient
-                if (nutritionalInfo.containsKey(ingredient)) {
-                    Map<String, String> nutrition = nutritionalInfo.get(ingredient);
-                    System.out.println("Nutritional Information for " + ingredient + ":");
-                    for (Map.Entry<String, String> entry : nutrition.entrySet()) {
-                        System.out.println(entry.getKey() + ": " + entry.getValue());
-                    }
-                } else {
-                    System.out.println("Nutritional information for " + ingredient + " is not available.");
+        boolean foundIngredient = false;
+        for (Map.Entry<String, List<String>> entry : ingredientMap.entrySet()) {
+            String category = entry.getKey();
+            List<String> ingredients = entry.getValue();
+            for (String ingredient : ingredients) {
+                if (userInput.contains(ingredient)) {
+                    foundIngredient = true;
+                    displayNutritionalInfo(ingredient);
+                    break;
                 }
-                return;
+            }
+            if (foundIngredient) {
+                break;
             }
         }
-        System.out.println("Could not find nutritional information for the specified ingredient.");
+        if (!foundIngredient) {
+            System.out.println("Could not find nutritional information for the specified ingredient.");
+        }
+    }
+
+    private static void displayNutritionalInfo(String ingredient) {
+        if (nutritionalInfo.containsKey(ingredient)) {
+            Map<String, String> nutrition = nutritionalInfo.get(ingredient);
+            System.out.println("Nutritional Information for " + ingredient + ":");
+            for (Map.Entry<String, String> entry : nutrition.entrySet()) {
+                System.out.println(entry.getKey() + ": " + entry.getValue());
+            }
+        } else {
+            System.out.println("Nutritional information for " + ingredient + " is not available.");
+        }
     }
 
     private static void convertIngredientQuantity(String userInput) {
@@ -159,39 +215,4 @@ public class ChatbotPro {
         System.out.println("Conversion functionality not implemented yet.");
     }
 
-    private static String fetchRecipeFromAPI(String userInput) {
-        try {
-            // Make HTTP request to the recipe API
-            URL url = new URL(RECIPE_API_URL + userInput);
-            Scanner scanner = new Scanner(url.openStream());
-            StringBuilder responseBuilder = new StringBuilder();
-            while (scanner.hasNextLine()) {
-                responseBuilder.append(scanner.nextLine());
-            }
-            scanner.close();
-
-            // Parse JSON response
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode rootNode = mapper.readTree(responseBuilder.toString());
-            JsonNode recipesNode = rootNode.get("results");
-            if (recipesNode != null && recipesNode.isArray() && recipesNode.size() > 0) {
-                // Get the first recipe from the response
-                JsonNode recipeNode = recipesNode.get(0);
-                JsonNode titleNode = recipeNode.get("title");
-                JsonNode instructionsNode = recipeNode.get("instructions");
-                if (titleNode != null && instructionsNode != null) {
-                    String recipeName = titleNode.asText();
-                    String recipeInstructions = instructionsNode.asText();
-                    return "Here's a recipe for " + recipeName + ":\n" + recipeInstructions;
-                } else {
-                    return "Sorry, I couldn't find the necessary information for the recipe.";
-                }
-            } else {
-                return "Sorry, I couldn't find any recipes for your query.";
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return "An error occurred while fetching recipes from the API.";
-        }
-    }
 }
