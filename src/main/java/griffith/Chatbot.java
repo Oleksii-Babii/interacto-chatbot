@@ -16,6 +16,8 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 class RoundButton extends JButton {
 
     /**
@@ -87,7 +89,7 @@ class Chatbot extends JFrame {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setLayout(null);
-        setSize(500, 400);
+        setSize(500, 430);
         setLocation(500,300);
         getContentPane().setBackground(Color.gray);
         setTitle("Fitness Program");
@@ -105,44 +107,49 @@ class Chatbot extends JFrame {
         ca.setSize(400, 310);
         ca.setLocation(20, 1);
         ca.setBackground(Color.white);
-        cf.setSize(300, 35);
+        cf.setSize(300, 30);
         cf.setLocation(20, 320);
 
+        cf.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                sendMessage();
+            }
+        });
+        
         b.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 if (e.getSource() == b) {
-                    
-                    // Wrap text
-                    String text = WordUtils.wrap(cf.getText(), 70);
-                                       
-                    ca.setForeground(Color.black);
-                    ca.setFont(new Font("SANS_SERIF", Font.BOLD, 12));
-                    ca.append("\nYou-->\n" + text + "\n");
-                    cf.setText("");
-
-                    if (text.contains("hi")) {
-                        replyMeth("Hi there");
-                    } else if (text.contains("how are you")) {
-                        replyMeth("I'm Good :).Thank you for asking");
-                    } else if (text.contains("what is your name")) {
-                        replyMeth("I'm the Trending BINOD");
-                    } else if (text.contains("gender")) {
-                        replyMeth("I'm Female. Don't Try to Flirt with me" + "\n" + "you Fell in love :)");
-                    } else if (text.contains("love you")) {
-                        replyMeth("I'm Feeling Shy :) Love you too");
-                    } else if (text.contains("bye")) {
-                        replyMeth("Too Soon :( Anyways" + "\n" + "STAY HOME STAY SAFE ");
-                    } else
-                        replyMeth("I Can't Understand");
-
+                	sendMessage();
+                	
                 }
 
             }
 
         });
-
+        	
     }
+    private void sendMessage() {
+         String text = WordUtils.wrap(cf.getText(), 70);
+         ca.setForeground(Color.black);
+         ca.setFont(new Font("SANS_SERIF", Font.BOLD, 12));
+         ca.append("\nYou-->\n" + text + "\n");
+         cf.setText("");
 
+         if (text.contains("hi")) {
+            replyMeth("Hi there");
+         } else if (text.contains("how are you")) {
+            replyMeth("I'm Good :). Thank you for asking");
+         } else if (text.contains("what is your name")) {
+            replyMeth("I'm the Trending BINOD");
+         } else if (text.contains("gender")) {
+            replyMeth("I'm Female. Don't Try to Flirt with me" + "\n" + "you Fell in love :)");
+         } else if (text.contains("love you")) {
+                	        replyMeth("I'm Feeling Shy :) Love you too");
+         } else if (text.contains("bye")) {
+            replyMeth("Too Soon :( Anyways" + "\n" + "STAY HOME STAY SAFE ");
+         } else
+            replyMeth("I Can't Understand");
+         }
     public void replyMeth(String s) {
         ca.append("\nChatBot-->\n" + s + "\n");
     }
