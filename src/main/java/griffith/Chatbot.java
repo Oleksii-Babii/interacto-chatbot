@@ -2,6 +2,7 @@ package griffith;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -82,28 +83,29 @@ class Chatbot extends JFrame {
     private JButton b = new RoundButton("SEND"); // Use RoundButton instead of JButton
     private JLabel l = new JLabel();
 
-    Chatbot() {
+    public Chatbot() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setLayout(null);
-        setSize(400, 400);
+        setSize(500, 400);
+        setLocation(500,300);
         getContentPane().setBackground(Color.gray);
         setTitle("Fitness Program");
 
         // Wrap the text area inside a scroll pane
         JScrollPane scrollPane = new JScrollPane(ca);
-        scrollPane.setBounds(20, 1, 300, 310);
+        scrollPane.setBounds(20, 20, 440, 280);
         add(scrollPane);
 
         add(cf);
         add(b);
         l.setText("SEND");
-        b.setSize(80, 30);
-        b.setLocation(250, 320);
-        ca.setSize(300, 310);
+        b.setSize(90, 30);
+        b.setLocation(350, 320);
+        ca.setSize(400, 310);
         ca.setLocation(20, 1);
-        ca.setBackground(Color.BLACK);
-        cf.setSize(200, 35);
+        ca.setBackground(Color.white);
+        cf.setSize(300, 35);
         cf.setLocation(20, 320);
 
         b.addActionListener(new ActionListener() {
@@ -111,10 +113,11 @@ class Chatbot extends JFrame {
                 if (e.getSource() == b) {
                     
                     // Wrap text
-                    String text = WordUtils.wrap(cf.getText(), 50);
+                    String text = WordUtils.wrap(cf.getText(), 70);
                                        
-                    ca.setForeground(Color.white);
-                    ca.append("You-->" + text + "\n");
+                    ca.setForeground(Color.black);
+                    ca.setFont(new Font("SANS_SERIF", Font.BOLD, 12));
+                    ca.append("\nYou-->\n" + text + "\n");
                     cf.setText("");
 
                     if (text.contains("hi")) {
@@ -141,7 +144,7 @@ class Chatbot extends JFrame {
     }
 
     public void replyMeth(String s) {
-        ca.append("\nChatBot-->" + s + "\n");
+        ca.append("\nChatBot-->\n" + s + "\n");
     }
 
     public static void main(String[] args) {
