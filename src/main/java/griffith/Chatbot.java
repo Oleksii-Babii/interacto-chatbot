@@ -1,3 +1,8 @@
+/**
+ * @author Ihor Tryndey 3105023 , Oleksii Babii 3104904
+ * @since 2024
+ * @version 1.0
+ */
 package griffith;
 
 import java.awt.Color;
