@@ -21,8 +21,8 @@ class Chatbot extends JFrame {
 
     private static final long serialVersionUID = 1L;
     private JTextArea ca = new JTextArea();
-    private JTextField cf = new RoundTextField(20); // Use RoundTextField instead of JTextField
-    private JButton b = new RoundButton("SEND"); // Use RoundButton instead of JButton
+    private JTextField cf = new RoundTextField(20); 
+    private JButton b = new RoundButton("SEND");
     private JLabel l = new JLabel();
 
     public Chatbot() {
@@ -33,8 +33,10 @@ class Chatbot extends JFrame {
         setLocation(500,300);
         getContentPane().setBackground(Color.gray);
         setTitle("Fitness Program");
-
-        // Wrap the text area inside a scroll pane
+        
+        /**
+         * Wrap text area inside the scrole panel
+         */
         JScrollPane scrollPane = new JScrollPane(ca);
         scrollPane.setBounds(20, 20, 440, 280);
         add(scrollPane);
