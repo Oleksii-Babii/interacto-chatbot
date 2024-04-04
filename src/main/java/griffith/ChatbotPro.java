@@ -96,7 +96,7 @@ public class ChatbotPro {
         Matcher nutritionMatcher = nutritionPattern.matcher(userInput);
 
         if (nutritionMatcher.find()) {
-        	System.out.println("Enter the name of the dish or product: ");
+        	System.out.println("Enter the name of the dish: ");
         	Scanner input = new Scanner(System.in);
         	String dish = input.nextLine();
             System.out.println(provideNutritionalInfo(dish));

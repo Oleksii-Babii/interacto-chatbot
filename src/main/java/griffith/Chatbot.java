@@ -8,7 +8,26 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.text.*;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -75,15 +94,28 @@ class RoundTextField extends JTextField {
     }
 }
 
-class Chatbot extends JFrame {
+class Chatbot extends JFrame implements ActionListener{
+	
+	private static final Map<String, List<String>> ingredientMap = new HashMap<>();
+	// private static final Map<String, Integer> cookingTimes = new HashMap<>();
+	private static final Map<String, Map<String, String>> nutritionalInfo = new HashMap<>();
+	private static final Map<String, String> favoriteRecipes = new HashMap<>();
+	private static final String RECIPE_API_URL = "https://api.edamam.com/search";
+	private static final String APP_ID = "b9576f7d";
+	private static final String APP_KEY = "d7a5d085107bf7dd9377ed2a4146576d";
 
     private static final long serialVersionUID = 1L;
-    private JTextArea ca = new JTextArea();
-    private JTextField cf = new RoundTextField(20); // Use RoundTextField instead of JTextField
-    private JButton b = new RoundButton("SEND"); // Use RoundButton instead of JButton
+    private static JTextArea ca = new JTextArea();
+    private static JTextField cf = new RoundTextField(20); // Use RoundTextField instead of JTextField
+    private static JButton b = new RoundButton("SEND"); // Use RoundButton instead of JButton
     private JLabel l = new JLabel();
+    private static String input = null;
+    
+   
+    
+    
 
-    public Chatbot() {
+    public Chatbot()  {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setResizable(false);
         setLayout(null);
@@ -107,53 +139,270 @@ class Chatbot extends JFrame {
         ca.setBackground(Color.white);
         cf.setSize(300, 30);
         cf.setLocation(20, 320);
-
-        cf.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                sendMessage();
-            }
-        });
+        ca.setForeground(Color.black);
+        ca.setFont(new Font("SANS_SERIF", Font.BOLD, 12));
+        ca.setEditable(false);
         
-        b.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (e.getSource() == b) {
-                	sendMessage();
-                	
-                }
-
-            }
-
-        });
-        	
+        cf.addActionListener(this);
+        b.addActionListener(this);
+        
+	}
+    
+    @Override
+	public void actionPerformed(ActionEvent e) {
+    	String userInput = getInput();
+    	String formattedInput = formatText(userInput);
+    	appendToTextArea(formattedInput);
+    	
+    	input = String.valueOf(userInput);
+    	System.out.println(input);
+    	
+	}
+  
+    private static String formatText(String input) {
+        String trimmedText = input.trim();
+        return WordUtils.wrap(trimmedText, 70);
     }
-    private void sendMessage() {
-         String text = WordUtils.wrap(cf.getText(), 70);
-         
-         ca.setForeground(Color.black);
-         ca.setFont(new Font("SANS_SERIF", Font.BOLD, 12));
-         ca.append("\nYou-->\n" + text + "\n");
-         cf.setText("");
 
-         if (text.contains("hi")) {
-            replyMeth("Hi there");
-         } else if (text.contains("how are you")) {
-            replyMeth("I'm Good :). Thank you for asking");
-         } else if (text.contains("what is your name")) {
-            replyMeth("I'm the Trending BINOD");
-         } else if (text.contains("gender")) {
-            replyMeth("I'm Female. Don't Try to Flirt with me" + "\n" + "you Fell in love :)");
-         } else if (text.contains("love you")) {
-                	        replyMeth("I'm Feeling Shy :) Love you too");
-         } else if (text.contains("bye")) {
-            replyMeth("Too Soon :( Anyways" + "\n" + "STAY HOME STAY SAFE ");
-         } else
-            replyMeth("I Can't Understand");
-         }
-    public void replyMeth(String s) {
+    private static void appendToTextArea(String text) {
+        ca.append("\nYou-->\n" + text + "\n");
+    }
+    
+ 
+    private static String getInput() {
+        String inputText = cf.getText();
+        cf.setText(""); // Clear the input field after capturing the text
+        return inputText;
+    }
+
+	public static String input() {
+		String userInput = null;
+		while(userInput == null) {
+			userInput = input;
+			System.out.println();
+		}
+		input = null;
+		
+		return userInput;
+	}
+    
+    public static void output(String s) {
         ca.append("\nChatBot-->\n" + s + "\n");
     }
+    
 
     public static void main(String[] args) {
-        new Chatbot().setVisible(true);
+       Chatbot chatbot = new Chatbot();
+       chatbot.setVisible(true);
+       
+//       output("Enter your name"); 
+//       output("Bye " + input());
+//       
+//       output("Enter your age");
+//       output("Ege: " + input());
+       
+       
+       initializeIngredients();
+       initializeNutritionalInfo();
+
+
+       output("Welcome to Cooking Helper Chatbot! How can I assist you today?");
+
+       while (true) {
+    	   
+           String userInput = input().toLowerCase();
+           if (userInput.equals("exit")) {
+        	   output("Exiting Cooking Helper Chatbot. Have a great day!");
+               break;
+           } else {
+               String response = generateResponse(userInput);
+               output(response);
+           }
+       }
+
+       
     }
+    
+    public static void initializeIngredients() {
+        // Initialize ingredients (for demonstration)
+        ingredientMap.put("pasta", Arrays.asList("spaghetti", "penne", "linguine"));
+        ingredientMap.put("chicken", Arrays.asList("breast", "thigh", "wing"));
+        ingredientMap.put("vegetables", Arrays.asList("broccoli", "carrot", "bell pepper"));
+    }
+
+
+    public static void initializeNutritionalInfo() {
+        // Initialize nutritional info (for demonstration)
+        Map<String, String> pastaNutrition = new HashMap<>();
+        pastaNutrition.put("calories", "200");
+        pastaNutrition.put("protein", "8g");
+        pastaNutrition.put("fat", "1g");
+        nutritionalInfo.put("spaghetti", pastaNutrition);
+
+        Map<String, String> chickenNutrition = new HashMap<>();
+        chickenNutrition.put("calories", "150");
+        chickenNutrition.put("protein", "20g");
+        chickenNutrition.put("fat", "5g");
+        nutritionalInfo.put("breast", chickenNutrition);
+
+        Map<String, String> broccoliNutrition = new HashMap<>();
+        broccoliNutrition.put("calories", "50");
+        broccoliNutrition.put("protein", "3g");
+        broccoliNutrition.put("fat", "0.5g");
+        nutritionalInfo.put("broccoli", broccoliNutrition);
+    }
+
+    public static String generateResponse(String userInput) {
+        Pattern recipePattern = Pattern.compile("\\b(recipe|cook|make|prepare)\\b");
+        Matcher recipeMatcher = recipePattern.matcher(userInput);
+
+        if (recipeMatcher.find()) {
+        	output("Enter the name of the dish: ");
+        	String dish = input();
+            try {
+				return suggestRecipe(dish);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        }
+
+        Pattern favoritePattern = Pattern.compile("\\b(favorite|save)\\b");
+        Matcher favoriteMatcher = favoritePattern.matcher(userInput);
+
+        if (favoriteMatcher.find()) {
+            saveFavoriteRecipe(userInput);
+            return "Recipe saved to favorites.";
+        }
+
+        Pattern nutritionPattern = Pattern.compile("\\b(nutrition|nutritional info)\\b");
+        Matcher nutritionMatcher = nutritionPattern.matcher(userInput);
+
+        if (nutritionMatcher.find()) {
+        	output("Enter the name of the dish or product: ");
+        	String dish = input();
+            output(provideNutritionalInfo(dish));
+            return ""; // Response handled within the method
+        }
+
+        Pattern convertPattern = Pattern.compile("\\b(convert|quantity)\\b");
+        Matcher convertMatcher = convertPattern.matcher(userInput);
+
+        if (convertMatcher.find()) {
+            convertIngredientQuantity(userInput);
+            return ""; // Response handled within the method
+        }
+
+        return "I'm sorry, I didn't understand your request. Could you please provide more details?";
+    }
+
+    public static String suggestRecipe(String userInput) throws IOException {
+        JsonNode rootNode = getRootNode(userInput);
+		JsonNode hitsNode = rootNode.get("hits");
+		if (hitsNode != null && hitsNode.isArray() && hitsNode.size() > 0) {
+		    // Get the first recipe from the response
+		    JsonNode recipeNode = hitsNode.get(0).get("recipe");
+		    
+		    JsonNode labelNode = recipeNode.get("label");
+		    JsonNode urlNode = recipeNode.get("url");
+		    if (labelNode != null && urlNode != null) {
+		        String recipeName = labelNode.asText();
+		        String recipeUrl = urlNode.asText();
+		        JsonNode ingredientLines = recipeNode.get("ingredientLines");
+		        String ingredients = "";
+		        for(int i = 0; i < ingredientLines.size(); i++) {
+		        	ingredients = ingredients + " - " +  ingredientLines.get(i).asText() + "\n";
+		        }
+		        String cookingTime = recipeNode.get("totalTime").asText();
+		        
+		        return "Here's a recipe for " + recipeName + ".\n"
+		        		+ "Cooking time: " + cookingTime + " min\n"
+		        		+ "Ingredients:\n"
+		        		+ ingredients + "\n"
+		        		+ provideNutritionalInfo(userInput) + "\n"
+		        		+ "You can find it here: " + recipeUrl;
+		    } else {
+		        return "Sorry, I couldn't find the necessary information for the recipe.";
+		    }
+		} else {
+		    return "Sorry, I couldn't find any recipes for your query.";
+		}
+    }
+
+    public static void saveFavoriteRecipe(String userInput) {
+        // Extract recipe name from user input and save it as favorite
+        String[] words = userInput.split("\\s+");
+        for (String word : words) {
+            if (ingredientMap.containsKey(word)) {
+                favoriteRecipes.put(word, word);
+                break;
+            }
+        }
+    }
+    
+    public static String provideNutritionalInfo(String userInput) {
+    	
+    	 	JsonNode rootNode = getRootNode(userInput);
+    	 	JsonNode hitsNode = rootNode.get("hits");
+            if (hitsNode != null && hitsNode.isArray() && hitsNode.size() > 0) {
+            	// Get the first recipe from the response
+            	JsonNode recipeNode = hitsNode.get(0).get("recipe");
+            	JsonNode labelNode = recipeNode.get("label");
+            	JsonNode urlNode = recipeNode.get("url");
+            	
+            	 if (labelNode != null && urlNode != null) {
+            		 String recipeName = labelNode.asText();
+            		 double hundredGramParts = recipeNode.get("totalWeight").asDouble() / 100.0;
+            		 JsonNode caloriesNode = recipeNode.get("calories");
+            		 String calories = String.format("%.02f", caloriesNode.asDouble()/hundredGramParts);
+            		 JsonNode totalNutrientsNode = recipeNode.get("totalNutrients");
+            		 JsonNode fatQuantity = totalNutrientsNode.get("FAT").get("quantity");
+            		 
+            		 //String fatQuantity = fatNode.get("quantity").asText();
+            		 String fat = String.format("%.02f", fatQuantity.asDouble()/hundredGramParts);
+            		 JsonNode proteinQuantity = totalNutrientsNode.get("PROCNT").get("quantity");
+            		 String protein = String.format("%.02f", proteinQuantity.asDouble()/hundredGramParts);
+            		 
+            		 return "Nutritional Information:\n"
+            			   + " Calories: " + calories + " kcal\n"
+            			   + " Protein: " + protein + " g\n"
+            		 	   + " Fat: " + fat + " g\n";
+            	 } else {
+            		 return "Sorry, I couldn't find the necessary nutritional information.";
+            	 }
+            	
+            } else {
+            	return "Sorry, I couldn't find any nutritional information for your query.";
+            }
+	      
+    }
+    
+    public static JsonNode getRootNode(String userInput) {
+    	try {
+    		// Make HTTP request to the recipe API
+            userInput = URLEncoder.encode(userInput, StandardCharsets.UTF_8);
+            URL url = new URL(RECIPE_API_URL + "?q=" + userInput + "&app_id=" + APP_ID + "&app_key=" + APP_KEY);
+            //output(url);
+            Scanner scanner = new Scanner(url.openStream());
+            StringBuilder responseBuilder = new StringBuilder();
+            while (scanner.hasNextLine()) {
+                responseBuilder.append(scanner.nextLine());
+            }
+            scanner.close();
+
+            // Parse JSON response
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readTree(responseBuilder.toString());
+    	} catch (Exception e) {
+    		e.printStackTrace();
+		}
+		return null;
+    	
+    }
+    
+    public static void convertIngredientQuantity(String userInput) {
+        // Dummy implementation for demonstration purposes
+        output("Conversion functionality not implemented yet.");
+    }
+	
 }
