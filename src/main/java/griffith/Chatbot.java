@@ -16,64 +16,6 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-class RoundButton extends JButton {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 2L;
-
-	public RoundButton(String label) {
-        super(label);
-        setContentAreaFilled(false); // Remove the default background
-        setOpaque(false); // Make the button transparent
-        setBorderPainted(false); // Remove the default border
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        if (getModel().isArmed()) {
-            g.setColor(Color.lightGray); // Change color when button is pressed
-        } else {
-            g.setColor(getBackground()); // Use the background color
-        }
-        ((Graphics2D) g).setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30); // Draw round shape
-        super.paintComponent(g);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(80, 20); // Set the preferred size
-    }
-}
-class RoundTextField extends JTextField {
-
-    /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	public RoundTextField(int columns) {
-        super(columns);
-        setOpaque(false); // Make the text field transparent
-        setBorder(null); // Remove the default border
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        Graphics2D g2 = (Graphics2D) g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(getBackground());
-        g2.fillRoundRect(0, 0, getWidth() - 1, getHeight() - 1, 30, 30); // Draw round shape
-        super.paintComponent(g2);
-    }
-
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(200, 20); // Set the preferred size
-    }
-}
 
 class Chatbot extends JFrame {
 
@@ -126,30 +68,34 @@ class Chatbot extends JFrame {
         });
         	
     }
+    
+
     private void sendMessage() {
-         String text = WordUtils.wrap(cf.getText(), 70);
+         String input = WordUtils.wrap(cf.getText(), 70);
          
          ca.setForeground(Color.black);
          ca.setFont(new Font("SANS_SERIF", Font.BOLD, 12));
-         ca.append("\nYou-->\n" + text + "\n");
+         ca.append("\nYou-->\n" + input + "\n");
          cf.setText("");
 
-         if (text.contains("hi")) {
-            replyMeth("Hi there");
-         } else if (text.contains("how are you")) {
-            replyMeth("I'm Good :). Thank you for asking");
-         } else if (text.contains("what is your name")) {
-            replyMeth("I'm the Trending BINOD");
-         } else if (text.contains("gender")) {
-            replyMeth("I'm Female. Don't Try to Flirt with me" + "\n" + "you Fell in love :)");
-         } else if (text.contains("love you")) {
-                	        replyMeth("I'm Feeling Shy :) Love you too");
-         } else if (text.contains("bye")) {
-            replyMeth("Too Soon :( Anyways" + "\n" + "STAY HOME STAY SAFE ");
+         if (input.contains("hi")) {
+            output("Hi there");
+         } else if (input.contains("how are you")) {
+            output("I'm Good :). Thank you for asking");
+         } else if (input.contains("what is your name")) {
+            output("I'm the Trending BINOD");
+         } else if (input.contains("gender")) {
+            output("I'm Female. Don't Try to Flirt with me" + "\n" + "you Fell in love :)");
+         } else if (input.contains("love you")) {
+                	        output("I'm Feeling Shy :) Love you too");
+         } else if (input.contains("bye")) {
+            output("Too Soon :( Anyways" + "\n" + "STAY HOME STAY SAFE ");
          } else
-            replyMeth("I Can't Understand");
+            output("I Can't Understand");
+         
          }
-    public void replyMeth(String s) {
+
+    public void output(String s) {
         ca.append("\nChatBot-->\n" + s + "\n");
     }
 

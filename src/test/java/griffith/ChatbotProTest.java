@@ -11,12 +11,12 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class ChatbotPro {
+public class ChatbotProTest {
 
 	private String input;
 	private String expectedOutput;
 	
-	public ChatbotPro(String input, String expectedOutput) {
+	public ChatbotProTest(String input, String expectedOutput) {
 		super();
 		this.input = input;
 		this.expectedOutput = expectedOutput;
