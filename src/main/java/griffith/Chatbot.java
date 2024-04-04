@@ -27,7 +27,6 @@ import org.apache.commons.lang3.text.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import ch.qos.logback.core.recovery.ResilientSyslogOutputStream;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
