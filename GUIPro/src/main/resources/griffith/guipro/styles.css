@@ -1,0 +1,17 @@
+.root {
+    -fx-font-family: 'Arial';
+}
+
+.text-area {
+    -fx-background-color: #f0f0f0;
+    -fx-text-fill: black;
+}
+
+.text-field, .button {
+    -fx-background-color: #e0e0e0;
+    -fx-text-fill: black;
+}
+
+.button:hover {
+    -fx-background-color: #cccccc;
+}
